@@ -80,13 +80,56 @@ var Mazes = (function() {
             L[c] = c; // Link c to c
             R[c] = c;
         }
+
+        // Entrance and exit
+        maze.at(0, 0).left = false;
+        maze.at(height-1, width-1).right = false;
          
         return maze;
+    }
+
+    function canvas(maze, canvasCtx, cellSize) {
+        var drawLine = function(x1, y1, x2, y2) {
+            var w = Math.abs(x2 - x1);
+            if (w == 0) {
+                w = 1;
+            }
+            var h = Math.abs(y2 - y1);
+            if (h == 0) {
+                h = 1;
+            }
+            context.fillRect(x1, y1, w, h);
+        }
+
+        var halfCell = cellSize / 2;
+
+        for (var r = 0; r < maze.height; r++) {
+            for (var c = 0; c < maze.width; c++) {
+                var cell = maze.at(r, c);
+                var x = c * cellSize + halfCell;
+                var y = r * cellSize + halfCell;
+                if (cell.up) {
+                    drawLine(x - halfCell, y - halfCell, x + halfCell, y - halfCell);
+                }
+                if (cell.down) {
+                    drawLine(x - halfCell, y + halfCell, x + halfCell, y + halfCell);
+                }
+                if (cell.left) {
+                    drawLine(x - halfCell, y - halfCell, x - halfCell, y + halfCell);
+                }
+                if (cell.right) {
+                    drawLine(x + halfCell, y - halfCell, x + halfCell, y + halfCell);
+                }
+            }
+        }
     }
 
     return {
         generate: function(width, height) {
             return eller(width, height);
+        },
+        draw: function(maze, canvasCtx, cellSize) {
+            return canvas(maze, canvasCtx, cellSize);
         }
     }
 })();

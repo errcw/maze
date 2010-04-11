@@ -4,34 +4,16 @@
         <script type='text/javascript' src='maze.js'></script>
     </head>
     <body>
-        <pre id='maze'>
-        </pre>
+        <canvas id='maze-canvas' width='500' height='500'>
+            Your browser does not support the &lt;canvas&gt; element.
+        </canvas>
         <script>
-            var m = Mazes.generate(50, 50);
+            var maze = Mazes.generate(30, 30);
 
-            var str = '';
-            for (var c = 0; c < m.width * 2; c++) {
-                str += '_';
-            }
-            str += '\n';
-            for (var r = 0; r < m.height; r++) {
-                str += '|';
-                for (var c = 0; c < m.width; c++) {
-                    var cell = m.at(r, c);
-                    //str += '+';
-                    //str += cell.up ? '-' : ' ';
-                    //str += '+';
-                    //str += cell.left ? '|' : ' ';
-                    //str += ' ';
-                    str += cell.down ? '_' : ' ';
-                    str += cell.right ? '|' : ' ';
-                    //str += '+';
-                    //str += '+';
-                }
-                str += '\n';
-            }
+            var canvas = document.getElementById('maze-canvas');
+            var context = canvas.getContext('2d');
 
-            document.getElementById('maze').innerHTML = str;
+            Mazes.draw(maze, context, 10);
         </script>
     </body>
 </html>
