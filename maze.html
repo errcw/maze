@@ -7,9 +7,13 @@
         <pre id='maze'>
         </pre>
         <script>
-            var str = '';
+            var m = Mazes.generate(50, 50);
 
-            var m = Mazes.generate(10, 10);
+            var str = '';
+            for (var c = 0; c < m.width * 2; c++) {
+                str += '_';
+            }
+            str += '\n';
             for (var r = 0; r < m.height; r++) {
                 str += '|';
                 for (var c = 0; c < m.width; c++) {
