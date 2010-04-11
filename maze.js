@@ -65,7 +65,7 @@ var Mazes = (function() {
 
         // Handle the last row to guarantee the maze is connected
         for (var c = 0; c < width; c++) {
-            if (c != width-1 && c != L[c+1] && (c == R[c] || Math.random() < 0.5)) {
+            if (c != width-1 && c+1 != R[c] && (c == R[c] || Math.random() < 0.5)) {
                 R[L[c+1]] = R[c]; // Link L[c+1] to R[c]
                 L[R[c]] = L[c+1];
                 R[c] = c+1; // Link c to c+1
@@ -77,8 +77,8 @@ var Mazes = (function() {
 
             R[L[c]] = R[c]; // Link L[c] to R[c]
             L[R[c]] = L[c];
-            L[c] = c; // Link c to c
-            R[c] = c;
+            R[c] = c; // Link c to c
+            L[c] = c;
         }
 
         // Entrance and exit
@@ -86,6 +86,33 @@ var Mazes = (function() {
         maze.at(height-1, width-1).right = false;
          
         return maze;
+    }
+
+    function dijkstra(maze) {
+        var cells = maze.width * maze.height;
+
+        var dist = [];
+        var prev = [];
+
+        for (var i = 0; i < cells; i++) {
+            dist[i] = cells+1;
+            prev[i] = null;
+        }
+
+        dist[0] = 0;
+
+        var q = new Heap(function (x) { return dist[x]; });
+        q.push(0);
+
+        while (q.size() > 0) {
+            var u = q.pop();
+
+            var cell = maze.at(Math.floor(u / maze.width), u % maze.width);
+            if (cell.up && dist[u]+1 < dist[v]) {
+                dist[v] = dist[u]+1;
+                prev[v] = u;
+            }
+        }
     }
 
     function canvas(maze, canvasCtx, cellSize) {
@@ -125,11 +152,8 @@ var Mazes = (function() {
     }
 
     return {
-        generate: function(width, height) {
-            return eller(width, height);
-        },
-        draw: function(maze, canvasCtx, cellSize) {
-            return canvas(maze, canvasCtx, cellSize);
-        }
+        generate: eller,
+        solve: dijkstra,
+        draw: canvas
     }
 })();
