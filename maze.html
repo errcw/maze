@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>Maze</title>
+        <script type='text/javascript' src='maze.js'></script>
+    </head>
+    <body>
+        <pre id='maze'>
+        </pre>
+        <script>
+            var str = '';
+
+            var m = Mazes.generate(10, 10);
+            for (var r = 0; r < m.height; r++) {
+                str += '|';
+                for (var c = 0; c < m.width; c++) {
+                    var cell = m.at(r, c);
+                    //str += '+';
+                    //str += cell.up ? '-' : ' ';
+                    //str += '+';
+                    //str += cell.left ? '|' : ' ';
+                    //str += ' ';
+                    str += cell.down ? '_' : ' ';
+                    str += cell.right ? '|' : ' ';
+                    //str += '+';
+                    //str += '+';
+                }
+                str += '\n';
+            }
+
+            document.getElementById('maze').innerHTML = str;
+        </script>
+    </body>
+</html>
