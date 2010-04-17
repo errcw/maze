@@ -96,26 +96,63 @@ var Mazes = (function() {
 
         for (var i = 0; i < cells; i++) {
             dist[i] = cells+1;
-            prev[i] = null;
+            prev[i] = -1;
         }
 
         dist[0] = 0;
 
         var q = new Heap(function (x) { return dist[x]; });
-        q.push(0);
+        for (var i = 0; i < cells; i++) {
+            q.push(i);
+        }
 
         while (q.size() > 0) {
             var u = q.pop();
+            var du = dist[u];
 
             var cell = maze.at(Math.floor(u / maze.width), u % maze.width);
-            if (cell.up && dist[u]+1 < dist[v]) {
-                dist[v] = dist[u]+1;
-                prev[v] = u;
+
+            var up = u - maze.width;
+            if (!cell.up && du+1 < dist[up]) {
+                dist[up] = du+1;
+                prev[up] = u;
+                q.decreaseKey(up);
+            }
+
+            var down = u + maze.width;
+            if (!cell.down && du+1 < dist[down]) {
+                dist[down] = du+1;
+                prev[down] = u;
+                q.decreaseKey(down);
+            }
+
+            var left = u - 1;
+            if (!cell.left && du+1 < dist[left]) {
+                dist[left] = du+1;
+                prev[left] = u;
+                q.decreaseKey(left);
+            }
+
+            var right = u + 1;
+            if (!cell.right && du+1 < dist[right]) {
+                dist[right] = du+1;
+                prev[right] = u;
+                q.decreaseKey(right);
             }
         }
+
+        var path = [];
+        step = cells - 1;
+        do {
+            path.push(step);
+            step = prev[step];
+        } while (step >= 0);
+        path.reverse();
+
+        return path;
     }
 
-    function canvas(maze, canvasCtx, cellSize) {
+    function canvasMaze(maze, canvasCtx, cellSize) {
         var drawLine = function(x1, y1, x2, y2) {
             var w = Math.abs(x2 - x1);
             if (w == 0) {
@@ -151,9 +188,20 @@ var Mazes = (function() {
         }
     }
 
+    function canvasPath(maze, path, canvasCtx, cellSize) {
+        var border = 2;
+        for (var i = 0; i < path.length; i++) {
+            var r = Math.floor(path[i] / maze.width);
+            var c = path[i] % maze.width;
+            context.fillRect(c * cellSize + border, r * cellSize + border,
+                             cellSize - border * 2, cellSize - border * 2);
+        }
+    }
+
     return {
         generate: eller,
         solve: dijkstra,
-        draw: canvas
+        drawMaze: canvasMaze,
+        drawPath: canvasPath
     }
 })();

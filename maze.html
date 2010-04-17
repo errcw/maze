@@ -14,7 +14,10 @@
             var canvas = document.getElementById('maze-canvas');
             var context = canvas.getContext('2d');
 
-            Mazes.draw(maze, context, 10);
+            Mazes.drawMaze(maze, context, 10);
+
+            var path = Mazes.solve(maze);
+            Mazes.drawPath(maze, path, context, 10);
         </script>
     </body>
 </html>
