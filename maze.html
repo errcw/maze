@@ -9,7 +9,7 @@
             Your browser does not support the &lt;canvas&gt; element.
         </canvas>
         <script>
-            var maze = Mazes.generate(30, 30);
+            var maze = Mazes.generate(20, 20);
 
             var canvas = document.getElementById('maze-canvas');
             var context = canvas.getContext('2d');
@@ -17,7 +17,8 @@
             Mazes.drawMaze(maze, context, 10);
 
             var path = Mazes.solve(maze);
-            Mazes.drawPath(maze, path, context, 10);
+            context.fillStyle = '#b74a4a';
+            Mazes.drawPath(path, context, 10);
         </script>
     </body>
 </html>

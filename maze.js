@@ -108,31 +108,33 @@ var Mazes = (function() {
 
         while (q.size() > 0) {
             var u = q.pop();
-            var du = dist[u];
+            // Early out if we have reached the end
+            if (u == cells - 1) {
+                break;
+            }
 
+            var du = dist[u];
             var cell = maze.at(Math.floor(u / maze.width), u % maze.width);
 
+            // Relax the adjacent cells
             var up = u - maze.width;
             if (!cell.up && du+1 < dist[up]) {
                 dist[up] = du+1;
                 prev[up] = u;
                 q.decreaseKey(up);
             }
-
             var down = u + maze.width;
             if (!cell.down && du+1 < dist[down]) {
                 dist[down] = du+1;
                 prev[down] = u;
                 q.decreaseKey(down);
             }
-
             var left = u - 1;
             if (!cell.left && du+1 < dist[left]) {
                 dist[left] = du+1;
                 prev[left] = u;
                 q.decreaseKey(left);
             }
-
             var right = u + 1;
             if (!cell.right && du+1 < dist[right]) {
                 dist[right] = du+1;
@@ -141,10 +143,11 @@ var Mazes = (function() {
             }
         }
 
+        // Construct the path from the previous links
         var path = [];
         step = cells - 1;
         do {
-            path.push(step);
+            path.push([Math.floor(step / maze.width), step % maze.width]);
             step = prev[step];
         } while (step >= 0);
         path.reverse();
@@ -154,47 +157,51 @@ var Mazes = (function() {
 
     function canvasMaze(maze, canvasCtx, cellSize) {
         var drawLine = function(x1, y1, x2, y2) {
-            var w = Math.abs(x2 - x1);
-            if (w == 0) {
-                w = 1;
-            }
-            var h = Math.abs(y2 - y1);
-            if (h == 0) {
-                h = 1;
-            }
-            context.fillRect(x1, y1, w, h);
+            var w = Math.max(Math.abs(x2 - x1), 1);
+            var h = Math.max(Math.abs(y2 - y1), 1);
+            canvasCtx.fillRect(x1, y1, w, h);
         }
-
-        var halfCell = cellSize / 2;
 
         for (var r = 0; r < maze.height; r++) {
             for (var c = 0; c < maze.width; c++) {
                 var cell = maze.at(r, c);
-                var x = c * cellSize + halfCell;
-                var y = r * cellSize + halfCell;
+                var x = c * cellSize;
+                var y = r * cellSize;
                 if (cell.up) {
-                    drawLine(x - halfCell, y - halfCell, x + halfCell, y - halfCell);
+                    drawLine(x, y, x + cellSize, y);
                 }
                 if (cell.down) {
-                    drawLine(x - halfCell, y + halfCell, x + halfCell, y + halfCell);
+                    drawLine(x, y + cellSize, x + cellSize, y + cellSize);
                 }
                 if (cell.left) {
-                    drawLine(x - halfCell, y - halfCell, x - halfCell, y + halfCell);
+                    drawLine(x, y, x, y + cellSize);
                 }
                 if (cell.right) {
-                    drawLine(x + halfCell, y - halfCell, x + halfCell, y + halfCell);
+                    drawLine(x + cellSize, y, x + cellSize, y + cellSize);
                 }
             }
         }
     }
 
-    function canvasPath(maze, path, canvasCtx, cellSize) {
-        var border = 2;
-        for (var i = 0; i < path.length; i++) {
-            var r = Math.floor(path[i] / maze.width);
-            var c = path[i] % maze.width;
-            context.fillRect(c * cellSize + border, r * cellSize + border,
-                             cellSize - border * 2, cellSize - border * 2);
+    function canvasPath(path, canvasCtx, cellSize) {
+        var drawLine = function(x1, y1, x2, y2) {
+            var sx = (x1 < x2) ? x1 : x2;
+            var sy = (y1 < y2) ? y1 : y2;
+            var w = Math.max(Math.abs(x2 - x1), 1);
+            var h = Math.max(Math.abs(y2 - y1), 1);
+            canvasCtx.fillRect(sx, sy, w, h);
+        }
+
+        var offset = cellSize / 2;
+
+        for (var i = 0; i < path.length - 1; i++) {
+            var curr = path[i][0], curc = path[i][1];
+            var nextr = path[i+1][0], nextc = path[i+1][1];
+
+            drawLine(curc * cellSize + offset,
+                     curr * cellSize + offset,
+                     nextc * cellSize + offset,
+                     nextr * cellSize + offset);
         }
     }
 
